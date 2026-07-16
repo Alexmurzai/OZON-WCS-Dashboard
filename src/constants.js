@@ -1,0 +1,186 @@
+export const translations = {
+  en: {
+    systemOp: 'System Operational',
+    telemetry: 'Sorting Node Telemetry',
+    addNode: 'Add Node',
+    nodeNamePrefix: 'Node #',
+    induction: 'Induction',
+    globalOverview: 'Global Overview',
+    noNodes: 'No active nodes. Add a node to begin monitoring.',
+    estopActive: 'E-Stop Active',
+    estopDesc: 'Conveyor Halted by Operator',
+    reset: 'RESET',
+    virtualEmu: 'Virtual Emulator',
+    liveWs: 'Live WebSocket',
+    wcsControl: 'WCS Control Panel',
+    estopBtn: 'E-STOP',
+    beltSpeed: 'Belt Speed',
+    diverterMode: 'Diverter Mode',
+    clearJam: 'Clear Jam',
+    calibrate: 'Calibrate',
+    lastScanned: 'Last Scanned Parcel',
+    waitingData: 'Waiting for data...',
+    weight: 'Weight',
+    dims: 'Dims (L×W×H)',
+    throughput: 'Throughput',
+    throughputChart: 'Throughput (last 60s)',
+    jamRate: 'Jam Rate',
+    noReadRate: 'No-Read Rate',
+    sgtAlertTitle: 'SGT (Oversized) Alert',
+    sgtAlertDesc: 'Oversized package detection',
+    detected: 'DETECTED',
+    halted: 'HALTED',
+    liveView: 'Live Monitor',
+    statsView: 'Statistics & Analytics',
+    exportCsv: 'Export CSV (Excel)',
+    time: 'Time',
+    parcelId: 'Parcel ID',
+    category: 'Category',
+    noData: 'No parcels scanned yet.',
+    diverterTypes: {
+      'Comitas Multibelt': 'Comitas Multibelt',
+      'Sliding Shoe': 'Sliding Shoe',
+      'Pop-up Wheel': 'Pop-up Wheel'
+    },
+    routingZone: 'Routing Zone',
+    zoneA: 'A (Induction)',
+    zoneB: 'B (Sortable)',
+    zoneC: 'C (Oversized)',
+    zoneD: 'D (Repackaging)',
+    mixedZone: 'Mixed Zone',
+    oee: 'OEE',
+    availability: 'Availability',
+    performance: 'Performance',
+    quality: 'Quality',
+    catDistribution: 'Category Distribution',
+    zoneDistribution: 'Routing Distribution',
+    totalProcessed: 'Total Processed',
+    avgThroughput: 'Avg Throughput',
+    sysHealth: 'System Health (OEE)',
+    mgtFull: 'Small Goods (MGT)',
+    kgtFull: 'Large Goods (KGT+)',
+    sgtFull: 'Oversized (SGT)',
+    zoneBFull: 'Zone B (Sortable)',
+    zoneCFull: 'Zone C (Oversized)',
+    zoneDFull: 'Zone D (Repackaging)',
+    legendMgt: 'Small Goods (up to 25kg, max 120cm)',
+    legendKgt: 'Large Goods (up to 25kg, 121-200cm)',
+    legendSgt: 'Oversized (>25kg or >280cm sum)',
+    legendZoneB: 'Sortable (Standard Box)',
+    legendZoneC: 'Oversized (Too small/large)',
+    legendZoneD: 'Repackaging (Round/Fragile)',
+    legendTitle: 'Legend & Abbreviations',
+    gameMode: 'Game Mode',
+    idealMode: 'Ideal Mode',
+    modeSelector: 'Operation Mode'
+  },
+  ru: {
+    systemOp: 'Система работает',
+    telemetry: 'Телеметрия сортировочного узла',
+    addNode: 'Добавить узел',
+    nodeNamePrefix: 'Узел #',
+    induction: 'Индукция',
+    globalOverview: 'Общая сводка',
+    noNodes: 'Нет активных узлов. Добавьте узел для начала.',
+    estopActive: 'Аварийная Остановка',
+    estopDesc: 'Конвейер остановлен оператором',
+    reset: 'СБРОС',
+    virtualEmu: 'Виртуальный Эмулятор',
+    liveWs: 'Live WebSocket',
+    wcsControl: 'Панель Управления WCS',
+    estopBtn: 'АВАРИЙНЫЙ СТОП',
+    beltSpeed: 'Скорость Ленты',
+    diverterMode: 'Тип Сортировщика',
+    clearJam: 'Сбросить Затор',
+    calibrate: 'Калибровка',
+    lastScanned: 'Последняя Посылка',
+    waitingData: 'Ожидание данных...',
+    weight: 'Вес',
+    dims: 'Габариты (Д×Ш×В)',
+    throughput: 'Пропускная Способность',
+    throughputChart: 'Пропускная способность (60с)',
+    jamRate: 'Частота Заторов',
+    noReadRate: 'Процент Непрочитанных',
+    sgtAlertTitle: 'Внимание: СГТ (Сверхгабарит)',
+    sgtAlertDesc: 'Обнаружена крупногабаритная посылка',
+    detected: 'ОБНАРУЖЕНО',
+    halted: 'ОСТАНОВЛЕНО',
+    liveView: 'Мониторинг',
+    statsView: 'Статистика и Аналитика',
+    exportCsv: 'Экспорт CSV (Excel)',
+    time: 'Время',
+    parcelId: 'Штрихкод',
+    category: 'Категория',
+    noData: 'Нет данных о посылках.',
+    diverterTypes: {
+      'Comitas Multibelt': 'Мультиременной (Comitas)',
+      'Sliding Shoe': 'Башмачный (Sliding Shoe)',
+      'Pop-up Wheel': 'Роликовый (Pop-up)'
+    },
+    routingZone: 'Зона Маршрутизации',
+    zoneA: 'Входная зона',
+    zoneB: 'B (Сортировка)',
+    zoneC: 'C (Негабарит)',
+    zoneD: 'D (Доупаковка)',
+    mixedZone: 'Смешанная зона',
+    oee: 'OEE',
+    availability: 'Доступность',
+    performance: 'Эффективность',
+    quality: 'Качество',
+    catDistribution: 'Распределение Категорий',
+    zoneDistribution: 'Распределение Зон',
+    totalProcessed: 'Всего обработано',
+    avgThroughput: 'Средняя пропускная',
+    sysHealth: 'Здоровье системы (OEE)',
+    mgtFull: 'Малогабарит (МГТ)',
+    kgtFull: 'Крупногабарит (КГТ+)',
+    sgtFull: 'Сверхгабарит (СГТ)',
+    zoneBFull: 'Зона B (Сортировка)',
+    zoneCFull: 'Зона C (Негабарит)',
+    zoneDFull: 'Зона D (Доупаковка)',
+    legendMgt: 'Малогабаритный товар (до 25кг, макс 120см)',
+    legendKgt: 'Крупногабаритный товар (до 25кг, 121-200см)',
+    legendSgt: 'Сверхгабаритный товар (>25кг или сум >280см)',
+    legendZoneB: 'Сортировка (Стандартные коробки)',
+    legendZoneC: 'Негабарит (Меньше мин. / больше макс.)',
+    legendZoneD: 'Доупаковка (Круглое сечение)',
+    legendTitle: 'Легенда и Расшифровка',
+    gameMode: 'Игровой Режим',
+    idealMode: 'Идеальный Режим',
+    modeSelector: 'Режим Симуляции'
+  }
+};
+
+export const CATEGORY_COLORS = {
+  'МГТ': 'bg-cyan-400/80 shadow-[0_0_15px_rgba(0,229,255,0.8)] border-cyan-200 text-black', 
+  'КГТ+': 'bg-indigo-500/80 shadow-[0_0_15px_rgba(83,109,254,0.8)] border-indigo-300 text-white', 
+  'СГТ': 'bg-fuchsia-500/90 shadow-[0_0_20px_rgba(255,0,255,1)] border-fuchsia-300 text-white', 
+};
+
+export const CHART_COLORS = {
+  'МГТ': '#22d3ee',
+  'КГТ+': '#6366f1',
+  'СГТ': '#d946ef',
+  'B': '#4ade80',
+  'C': '#fb923c',
+  'D': '#60a5fa'
+};
+
+export const DIVERTER_TYPES = ['Comitas Multibelt', 'Sliding Shoe', 'Pop-up Wheel'];
+
+export const generateId = () => `OZ-${Math.random().toString(36).substr(2, 6).toUpperCase()}-${Math.floor(Math.random()*99)}`;
+
+export const calculateCategory = (weight, x, y, z) => {
+  const maxSide = Math.max(x, y, z);
+  const sumSides = x + y + z;
+  if (weight > 25 || maxSide > 200 || sumSides > 280) return 'СГТ';
+  if (weight <= 25 && maxSide > 120 && sumSides > 200) return 'КГТ+';
+  return 'МГТ';
+};
+
+export const calculateRoutingZone = (x, y, z, roundingFactor, weight) => {
+  if (parseFloat(roundingFactor) > 0.7) return 'D';
+  const category = calculateCategory(weight, x, y, z);
+  if (category === 'СГТ' || category === 'КГТ+') return 'C';
+  return 'B';
+};

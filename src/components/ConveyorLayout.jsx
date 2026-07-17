@@ -64,7 +64,7 @@ const getPos = (pathId, progress, offset, routingZone) => {
   return { x, y, angle };
 };
 
-export default function ConveyorLayout({ parcels, viewBox = "0 0 800 500", isRunning = true }) {
+export default function ConveyorLayout({ parcels, viewBox = "0 0 800 500", isRunning = true, lang = 'en' }) {
   const [hoveredParcel, setHoveredParcel] = useState(null);
   
   // Animation classes for stripes based on whether the belt is running
@@ -140,21 +140,35 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 800 500", isRun
           <text x="20" y="-10" fill="#FF1744" fontSize="12" textAnchor="middle" fontWeight="bold">DWS</text>
         </g>
 
-        <g fill="rgba(255,255,255,0.6)" fontSize="14" fontWeight="bold" fontFamily="monospace">
-          <text x="730" y="255">Zone A</text>
-          <text x="645" y="40">Zone D</text>
-          <text x="400" y="455">Mixed Zone</text>
-          <text x="15" y="255">Zone B</text>
-          <text x="345" y="255">Zone C</text>
-          <text x="645" y="155" fill="#00E5FF">Node 1</text>
-          <text x="200" y="145" textAnchor="middle" fill="#536DFE">Node 2</text>
+        <g fontSize="14" fontWeight="bold" fontFamily="monospace">
+          {/* Zone A (no dot, just white) */}
+          <text x="730" y="255" fill="rgba(255,255,255,0.6)">{lang === 'ru' ? 'Зона' : 'Zone'} A</text>
+          
+          {/* Zone C (orange dot) — UP from Node 1 (was Zone D position) */}
+          <circle cx="638" cy="36" r="5" fill="#fb923c" />
+          <text x="650" y="40" fill="#fb923c">{lang === 'ru' ? 'Зона' : 'Zone'} C</text>
+          
+          {/* Mixed Zone */}
+          <text x="400" y="455" fill="rgba(255,255,255,0.6)">{lang === 'ru' ? 'Смешанная зона' : 'Mixed Zone'}</text>
+          
+          {/* Zone B (green dot) — LEFT from Node 2 */}
+          <circle cx="8" cy="251" r="5" fill="#4ade80" />
+          <text x="18" y="255" fill="#4ade80">{lang === 'ru' ? 'Зона' : 'Zone'} B</text>
+          
+          {/* Zone D (blue dot) — RIGHT from Node 2 (was Zone C position) */}
+          <circle cx="338" cy="251" r="5" fill="#60a5fa" />
+          <text x="348" y="255" fill="#60a5fa">{lang === 'ru' ? 'Зона' : 'Zone'} D</text>
+          
+          {/* Node labels */}
+          <text x="645" y="155" fill="#00E5FF">{lang === 'ru' ? 'Узел' : 'Node'} 1</text>
+          <text x="200" y="145" textAnchor="middle" fill="#536DFE">{lang === 'ru' ? 'Узел' : 'Node'} 2</text>
         </g>
 
         {/* Direction arrows */}
         <g fill="none" stroke="rgba(255,100,100,0.6)" strokeWidth="2">
           {/* pathA: right to left */}
           <path d="M 780,170 L 700,170 L 710,165 M 700,170 L 710,175" />
-          {/* pathD: down to up */}
+          {/* pathD (Zone C): down to up */}
           <path d="M 570,120 L 570,60 L 565,70 M 570,60 L 575,70" />
           {/* pathMix: down then left then up */}
           <path d="M 630,300 L 630,340 L 625,330 M 630,340 L 635,330" />
@@ -162,7 +176,7 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 800 500", isRun
           <path d="M 170,300 L 170,250 L 165,260 M 170,250 L 175,260" />
           {/* pathB: right to left */}
           <path d="M 100,170 L 40,170 L 50,165 M 40,170 L 50,175" />
-          {/* pathC: left to right */}
+          {/* pathC (Zone D): left to right */}
           <path d="M 300,170 L 370,170 L 360,165 M 370,170 L 360,175" />
         </g>
 

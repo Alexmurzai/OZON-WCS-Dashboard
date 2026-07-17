@@ -269,13 +269,15 @@ export function useConveyorSimulation(speed, isEmulator, isEStop, isGameMode) {
               newPathId = 'pathR1';
               newProgress = 0;
             } else if (p.pathId === 'pathR1') {
-              newPathId = p.routingZone === 'D' ? 'pathD' : 'pathMix';
+              // Zone C (oversized) diverts UP at Node 1
+              newPathId = p.routingZone === 'C' ? 'pathD' : 'pathMix';
               newProgress = 0;
             } else if (p.pathId === 'pathMix') {
               newPathId = 'pathR2';
               newProgress = 0;
             } else if (p.pathId === 'pathR2') {
-              newPathId = p.routingZone === 'C' ? 'pathC' : 'pathB';
+              // Zone D (round/fragile) diverts RIGHT at Node 2
+              newPathId = p.routingZone === 'D' ? 'pathC' : 'pathB';
               newProgress = 0;
             }
           }
@@ -288,10 +290,10 @@ export function useConveyorSimulation(speed, isEmulator, isEStop, isGameMode) {
           if (p.progress >= 1 && ['pathD', 'pathB', 'pathC'].includes(p.pathId)) {
             completedThisTick.current += 1;
             totalCompletedAllTime.current += 1;
-            // Track per-zone exits
-            if (p.pathId === 'pathD') exitCountD.current += 1;
+            // Track per-zone exits (pathD is now Zone C position, pathC is now Zone D position)
+            if (p.pathId === 'pathD') exitCountC.current += 1;
             if (p.pathId === 'pathB') exitCountB.current += 1;
-            if (p.pathId === 'pathC') exitCountC.current += 1;
+            if (p.pathId === 'pathC') exitCountD.current += 1;
             return false;
           }
           // Also count parcels transitioning from pathR1 to pathMix as "passed Node 1"

@@ -25,11 +25,14 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
     availability: 100,
     performance: 100,
     quality: 100,
-    node1: { active: 0, throughputC: 0, throughputD: 0, throughputMix: 0 },
-    node2: { active: 0, throughputB: 0 }
+    node1: { active: 0, throughputC: 0, throughputMix: 0 },
+    node2: { active: 0, throughputB: 0, throughputD: 0 },
+    node1Accumulated: { 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0, 'C': 0, 'Mix': 0 },
+    node2Accumulated: { 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0, 'B': 0, 'D': 0 }
   });
 
   const parcelsRef = useRef([]);
+  const historyParcelsRef = useRef([]);
   const lastTimeRef = useRef(null);
   const animRef = useRef(null);
   
@@ -56,6 +59,7 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
   useEffect(() => {
     if (isStarted) {
       parcelsRef.current = [];
+      historyParcelsRef.current = [];
       completionWindow.current = Array(60).fill(0);
       completedThisTick.current = 0;
       totalCompletedAllTime.current = 0;
@@ -75,8 +79,10 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
         catCounts: { 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0 },
         zoneCounts: { 'B': 0, 'C': 0, 'D': 0 },
         oee: 100, availability: 100, performance: 100, quality: 100,
-        node1: { active: 0, throughputC: 0, throughputD: 0, throughputMix: 0 },
-        node2: { active: 0, throughputB: 0 }
+        node1: { active: 0, throughputC: 0, throughputMix: 0 },
+        node2: { active: 0, throughputB: 0, throughputD: 0 },
+        node1Accumulated: { 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0, 'C': 0, 'Mix': 0 },
+        node2Accumulated: { 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0, 'B': 0, 'D': 0 }
       });
       setParcels([]);
     }
@@ -166,12 +172,29 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
       totalCounter.current += 1;
       if (isNoRead) noReadCounter.current += 1;
       
-      setMetrics(m => ({
-        ...m, totalProcessed: m.totalProcessed + 1,
-        catCounts: { ...m.catCounts, [category]: m.catCounts[category] + 1 },
-        zoneCounts: { ...m.zoneCounts, [routingZone]: m.zoneCounts[routingZone] + 1 }
-      }));
+      setMetrics(m => {
+        const n1Acc = { ...m.node1Accumulated };
+        n1Acc[category] = (n1Acc[category] || 0) + 1;
+        if (routingZone === 'C') n1Acc['C'] = (n1Acc['C'] || 0) + 1;
+        else n1Acc['Mix'] = (n1Acc['Mix'] || 0) + 1;
+        
+        const n2Acc = { ...m.node2Accumulated };
+        if (routingZone !== 'C') {
+          n2Acc[category] = (n2Acc[category] || 0) + 1;
+          if (routingZone === 'D') n2Acc['D'] = (n2Acc['D'] || 0) + 1;
+          else n2Acc['B'] = (n2Acc['B'] || 0) + 1;
+        }
+
+        return {
+          ...m, totalProcessed: m.totalProcessed + 1,
+          catCounts: { ...m.catCounts, [category]: m.catCounts[category] + 1 },
+          zoneCounts: { ...m.zoneCounts, [routingZone]: m.zoneCounts[routingZone] + 1 },
+          node1Accumulated: n1Acc,
+          node2Accumulated: n2Acc
+        };
+      });
       parcelsRef.current = [...parcelsRef.current, newParcel];
+      historyParcelsRef.current = [...historyParcelsRef.current, newParcel];
     }, minClearanceTime + Math.random() * 500);
 
     return () => clearInterval(timer);
@@ -286,5 +309,11 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
     setParcels([...parcelsRef.current]);
   }, []);
 
-  return { parcels, metrics, clearJam, calibrate };
+  return { 
+    parcels, 
+    historyParcels: historyParcelsRef.current,
+    metrics, 
+    clearJam, 
+    calibrate 
+  };
 }

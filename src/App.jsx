@@ -5,6 +5,7 @@ import { useConveyorSimulation } from './hooks/useConveyorSimulation';
 import ConveyorLayout from './components/ConveyorLayout';
 import ControlPanel from './components/ControlPanel';
 import NodeDetailView from './components/NodeDetailView';
+import ParcelHistoryTable from './components/ParcelHistoryTable';
 import { Chart, ProgressRing, DonutChart, LegendWidget } from './components/StatsPanel';
 
 export default function App() {
@@ -18,7 +19,7 @@ export default function App() {
   const [isGameMode, setIsGameMode] = useState(false);
   const [isStarted, setIsStarted] = useState(false);
 
-  const { parcels, metrics, clearJam, calibrate } = useConveyorSimulation(speed, isStarted, isEStop, isGameMode);
+  const { parcels, historyParcels, metrics, clearJam, calibrate } = useConveyorSimulation(speed, isStarted, isEStop, isGameMode);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
@@ -69,7 +70,17 @@ export default function App() {
       {activeTab === 'global' && (
         <main className="flex-1 flex gap-3 p-3 min-h-0 overflow-hidden">
           
-          {/* LEFT: Conveyor Visualization */}
+          {/* LEFT: Parcel History Table */}
+          <div className="w-[300px] shrink-0">
+            <ParcelHistoryTable 
+              title={lang === 'ru' ? 'История всех грузов' : 'All Parcels History'}
+              parcels={historyParcels} 
+              lang={lang} 
+              filename="global-parcel-history.csv" 
+            />
+          </div>
+
+          {/* MIDDLE: Conveyor Visualization */}
           <div className="flex-1 flex flex-col min-w-0 relative">
             <div className="flex-1 min-h-0">
               <ConveyorLayout parcels={parcels} isRunning={isStarted && !isEStop} lang={lang} />
@@ -180,14 +191,11 @@ export default function App() {
       {/* NODE VIEWS */}
       {(activeTab === 'node1' || activeTab === 'node2') && (
         <main className="flex-1 p-3 min-h-0 overflow-hidden">
-          <NodeDetailView 
-            nodeId={activeTab === 'node1' ? 1 : 2}
-            parcels={parcels}
-            metrics={metrics}
-            t={t}
-            isEStop={isEStop}
-            lang={lang}
-          />
+          {/* Node 1 Detail */}
+          {activeTab === 'node1' && <NodeDetailView nodeId={1} parcels={parcels} historyParcels={historyParcels} metrics={metrics} t={t} isEStop={isEStop} lang={lang} />}
+          
+          {/* Node 2 Detail */}
+          {activeTab === 'node2' && <NodeDetailView nodeId={2} parcels={parcels} historyParcels={historyParcels} metrics={metrics} t={t} isEStop={isEStop} lang={lang} />}
         </main>
       )}
     </div>

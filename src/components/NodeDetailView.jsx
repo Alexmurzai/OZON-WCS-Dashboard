@@ -1,9 +1,10 @@
 import React from 'react';
 import ConveyorLayout from './ConveyorLayout';
 import { DonutChart, ProgressRing } from './StatsPanel';
+import ParcelHistoryTable from './ParcelHistoryTable';
 import { CHART_COLORS } from '../constants';
 
-export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, lang = 'en' }) {
+export default function NodeDetailView({ nodeId, parcels, historyParcels = [], metrics, t, isEStop, lang = 'en' }) {
   // Node 1: centered at x=600, y=200
   // Node 2: centered at x=200, y=200
   const viewBox = nodeId === 1 ? "400 -20 400 360" : "0 -20 400 360";
@@ -13,22 +14,15 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
   const relevantPaths = nodeId === 1 ? node1Paths : node2Paths;
   const nodeParcels = parcels.filter(p => relevantPaths.includes(p.pathId));
   
-  const nodeCatCounts = { 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0 };
-  const nodeZoneCounts = nodeId === 1 ? { 'C': 0, 'Mix': 0 } : { 'B': 0, 'D': 0 };
-  
-  nodeParcels.forEach(p => {
-    nodeCatCounts[p.category] = (nodeCatCounts[p.category] || 0) + 1;
-    if (nodeId === 1) {
-      if (p.pathId === 'pathD') nodeZoneCounts['C'] += 1;
-      else nodeZoneCounts['Mix'] += 1;
-    } else {
-      if (p.pathId === 'pathC') nodeZoneCounts['D'] += 1;
-      else nodeZoneCounts['B'] += 1;
-    }
-  });
-
   const nodeData = nodeId === 1 ? metrics.node1 : metrics.node2;
+  const nodeAccumulated = nodeId === 1 ? metrics.node1Accumulated : metrics.node2Accumulated;
   const hasJam = nodeParcels.some(p => p.isJammed);
+  
+  // Historical parcels for this node
+  const nodeHistory = historyParcels.filter(p => {
+    if (nodeId === 1) return true; // Node 1 sees everything
+    return p.routingZone !== 'C'; // Node 2 sees everything except Zone C
+  });
   
   const zn = lang === 'ru' ? 'Зона' : 'Zone';
   const nd = lang === 'ru' ? 'Узел' : 'Node';
@@ -43,36 +37,14 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
   return (
     <div className="flex gap-3 h-full animate-in fade-in duration-500">
       
-      {/* LEFT: Parcel Table */}
-      <div className="w-[240px] shrink-0 glass-panel p-3 rounded-xl flex flex-col min-h-0 overflow-hidden">
-        <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-2">{t.passingParcels || 'Passing Parcels'}</div>
-        <div className="flex-1 overflow-y-auto scrollbar-hide text-[10px]">
-          <table className="w-full">
-            <thead className="sticky top-0 bg-[#12121a]">
-              <tr className="text-gray-500">
-                <th className="text-left py-1 px-1">ID</th>
-                <th className="text-left py-1 px-1">{lang === 'ru' ? 'Кат.' : 'Cat.'}</th>
-                <th className="text-right py-1 px-1">{lang === 'ru' ? 'Вес' : 'Wt'}</th>
-                <th className="text-right py-1 px-1">{lang === 'ru' ? 'Габ.' : 'Dim'}</th>
-                <th className="text-right py-1 px-1">{lang === 'ru' ? 'Скр.' : 'Rnd'}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {nodeParcels.slice(0, 30).map(p => (
-                <tr key={p.id} className="border-t border-white/5 text-gray-300 hover:bg-white/5">
-                  <td className="py-0.5 px-1 font-mono text-[9px]">{p.id.split('-')[1]}</td>
-                  <td className="py-0.5 px-1 font-bold" style={{color: catColor(p.category)}}>{p.category}</td>
-                  <td className="py-0.5 px-1 text-right">{p.weight}</td>
-                  <td className="py-0.5 px-1 text-right text-[9px]">{p.dimensions.x}×{p.dimensions.y}</td>
-                  <td className="py-0.5 px-1 text-right">{p.rounding_factor}</td>
-                </tr>
-              ))}
-              {nodeParcels.length === 0 && (
-                <tr><td colSpan="5" className="py-4 text-center text-gray-600 text-xs">{lang === 'ru' ? 'Нет грузов' : 'No parcels'}</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      {/* LEFT: Parcel History Table */}
+      <div className="w-[300px] shrink-0">
+        <ParcelHistoryTable 
+          title={lang === 'ru' ? 'История грузов' : 'Parcel History'}
+          parcels={nodeHistory} 
+          lang={lang} 
+          filename={`node${nodeId}-history.csv`} 
+        />
       </div>
 
       {/* CENTER: Zoomed ConveyorLayout (fragment) */}
@@ -135,10 +107,54 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
         </div>
         
         {/* Category donut */}
-        <DonutChart dataObj={nodeCatCounts} title={`${t.catDistribution} (${nd}${nodeId})`} />
+        <div className="glass-panel p-3 rounded-xl flex-1 flex flex-col items-center justify-center">
+          <div className="text-[9px] text-gray-400 uppercase tracking-widest w-full mb-1">{t.catDistribution || 'Category Distribution'} ({nd}{nodeId})</div>
+          <div className="w-24 h-24">
+            <DonutChart 
+              data={[
+                { label: 'МГТ', value: nodeAccumulated['МГТ'] || 0, color: CHART_COLORS[0] },
+                { label: 'КГТ+', value: nodeAccumulated['КГТ+'] || 0, color: CHART_COLORS[1] },
+                { label: 'СГТ', value: nodeAccumulated['СГТ'] || 0, color: CHART_COLORS[2] }
+              ]} 
+              title="Total"
+            />
+          </div>
+          <div className="w-full mt-2 flex flex-wrap justify-center gap-2 text-[8px]">
+            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full" style={{backgroundColor: CHART_COLORS[0]}}></span>МГТ: {nodeAccumulated['МГТ'] || 0}</span>
+            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full" style={{backgroundColor: CHART_COLORS[1]}}></span>КГТ+: {nodeAccumulated['КГТ+'] || 0}</span>
+            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full" style={{backgroundColor: CHART_COLORS[2]}}></span>СГТ: {nodeAccumulated['СГТ'] || 0}</span>
+          </div>
+        </div>
         
         {/* Zone donut */}
-        <DonutChart dataObj={nodeZoneCounts} title={`${t.zoneDistribution} (${nd}${nodeId})`} />
+        <div className="glass-panel p-3 rounded-xl flex-1 flex flex-col items-center justify-center">
+          <div className="text-[9px] text-gray-400 uppercase tracking-widest w-full mb-1">{lang === 'ru' ? 'Распределение Зон' : 'Zone Distribution'} ({nd}{nodeId})</div>
+          <div className="w-24 h-24">
+            <DonutChart 
+              data={nodeId === 1 ? [
+                { label: 'Zone C', value: nodeAccumulated['C'] || 0, color: '#fb923c' },
+                { label: 'Mixed', value: nodeAccumulated['Mix'] || 0, color: '#c084fc' }
+              ] : [
+                { label: 'Zone B', value: nodeAccumulated['B'] || 0, color: '#4ade80' },
+                { label: 'Zone D', value: nodeAccumulated['D'] || 0, color: '#60a5fa' }
+              ]} 
+              title="Total"
+            />
+          </div>
+          <div className="w-full mt-2 flex flex-wrap justify-center gap-2 text-[8px]">
+            {nodeId === 1 ? (
+              <>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>C: {nodeAccumulated['C'] || 0}</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>Mix: {nodeAccumulated['Mix'] || 0}</span>
+              </>
+            ) : (
+              <>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>B: {nodeAccumulated['B'] || 0}</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>D: {nodeAccumulated['D'] || 0}</span>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Routing Rules */}
         <div className="glass-panel p-3 rounded-xl">

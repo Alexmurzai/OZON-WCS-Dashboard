@@ -4,9 +4,9 @@ import { DonutChart, ProgressRing } from './StatsPanel';
 import { CHART_COLORS } from '../constants';
 
 export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, lang = 'en' }) {
-  // Node 1: fragment showing Zone A, DWS, Node 1, Zone C (up), Zone D (right-down) 
-  // Node 2: fragment showing Mixed Zone arrival, Node 2, Zone B (left)
-  const viewBox = nodeId === 1 ? "540 -20 280 360" : "-20 120 280 360";
+  // Node 1: centered at x=600, y=200
+  // Node 2: centered at x=200, y=200
+  const viewBox = nodeId === 1 ? "400 -20 400 360" : "0 -20 400 360";
   
   const node1Paths = ['pathA', 'pathR1', 'pathD'];
   const node2Paths = ['pathMix', 'pathR2', 'pathB', 'pathC'];

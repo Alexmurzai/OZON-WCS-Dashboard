@@ -86,50 +86,44 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
         <g strokeLinejoin="miter" strokeLinecap="butt">
           {/* Layer 1: Red Outline */}
           <g stroke="#FF5252" strokeWidth="84" fill="none">
-            <path d="M 800,200 L 640,200" />
-            <path d="M 640,200 L 600,200" />
-            <path d="M 600,160 L 600,20" />
-            <path d="M 600,240 L 600,350 Q 600,400 550,400 L 250,400 Q 200,400 200,350 L 200,240" />
-            <path d="M 200,200 L 120,200" />
-            <path d="M 120,200 L 0,200" />
-            <path d="M 200,200 L 280,200" />
-            <path d="M 280,200 L 400,200" />
+            <path d="M 800,200 L 600,200" />
+            <path d="M 600,200 L 600,20" />
+            <path d="M 600,200 L 600,350 Q 600,400 550,400 L 250,400 Q 200,400 200,350 L 200,200" />
+            <path d="M 200,200 L 0,200" />
+            <path d="M 200,200 L 400,200" />
           </g>
 
           {/* Layer 2: Dark Belt Background */}
           <g stroke="#1e1e28" strokeWidth="80" fill="none">
-            <path d="M 800,200 L 640,200" />
-            <path d="M 640,200 L 600,200" />
-            <path d="M 600,160 L 600,20" />
-            <path d="M 600,240 L 600,350 Q 600,400 550,400 L 250,400 Q 200,400 200,350 L 200,240" />
-            <path d="M 200,200 L 120,200" />
-            <path d="M 120,200 L 0,200" />
-            <path d="M 200,200 L 280,200" />
-            <path d="M 280,200 L 400,200" />
+            <path d="M 800,200 L 600,200" />
+            <path d="M 600,200 L 600,20" />
+            <path d="M 600,200 L 600,350 Q 600,400 550,400 L 250,400 Q 200,400 200,350 L 200,200" />
+            <path d="M 200,200 L 0,200" />
+            <path d="M 200,200 L 400,200" />
           </g>
           
           {/* Layer 3: Animated Stripes */}
           <g stroke="#3a3a4c" strokeWidth="80" fill="none" strokeDasharray="3 20">
             <g className={stripeClass}>
               <path d="M 800,200 L 640,200" />
-              <path d="M 600,240 L 600,350 Q 600,400 550,400 L 250,400 Q 200,400 200,350 L 200,240" />
               <path d="M 600,160 L 600,20" />
-              <path d="M 120,200 L 0,200" />
-              <path d="M 280,200 L 400,200" />
+              <path d="M 600,240 L 600,350 Q 600,400 550,400 L 250,400 Q 200,400 200,350 L 200,240" />
+              <path d="M 160,200 L 0,200" />
+              <path d="M 240,200 L 400,200" />
             </g>
             <g className={fastStripeClass}>
-              <path d="M 620,240 L 620,160" strokeWidth="40" />
-              <path d="M 640,200 L 600,200" />
-              <path d="M 200,200 L 120,200" />
-              <path d="M 200,200 L 280,200" />
+              <path d="M 600,200 L 600,160" strokeWidth="40" />
+              <path d="M 600,200 L 600,240" strokeWidth="40" />
+              <path d="M 200,200 L 160,200" strokeWidth="40" />
+              <path d="M 200,200 L 240,200" strokeWidth="40" />
             </g>
           </g>
         </g>
         
-        {/* Node 1: Translucent cyan (half the reverse) */}
-        <rect x="600" y="160" width="40" height="80" fill="#00E5FF" opacity="0.15" rx="4" />
-        {/* Node 2 junction */}
-        <rect x="160" y="160" width="80" height="80" fill="#536DFE" opacity="0.1" />
+        {/* Node 1 junction box */}
+        <rect x="560" y="160" width="80" height="80" fill="#00E5FF" opacity="0.15" rx="8" />
+        {/* Node 2 junction box */}
+        <rect x="160" y="160" width="80" height="80" fill="#536DFE" opacity="0.15" rx="8" />
 
         {/* DWS Scanner - moved to x=700 */}
         <g transform="translate(700, 140)" style={{cursor: 'help'}}>
@@ -157,8 +151,8 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
           <circle cx="368" cy="176" r="5" fill="#60a5fa" />
           <text x="378" y="180" fill="#60a5fa">{lang==='ru'?'Зона':'Zone'} D</text>
           
-          <text x="560" y="215" fill="#00E5FF" fontSize="12">{lang==='ru'?'Узел':'Node'} 1</text>
-          <text x="200" y="150" textAnchor="middle" fill="#536DFE" fontSize="12">{lang==='ru'?'Узел':'Node'} 2</text>
+          <text x="545" y="205" textAnchor="end" fill="#00E5FF" fontSize="12">{lang==='ru'?'Узел':'Node'} 1</text>
+          <text x="200" y="145" textAnchor="middle" fill="#536DFE" fontSize="12">{lang==='ru'?'Узел':'Node'} 2</text>
         </g>
 
         {/* Direction arrows */}

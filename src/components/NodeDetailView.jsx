@@ -106,54 +106,29 @@ export default function NodeDetailView({ nodeId, parcels, historyParcels = [], m
           )}
         </div>
         
-        {/* Category donut */}
         <div className="glass-panel p-3 rounded-xl flex-1 flex flex-col items-center justify-center">
-          <div className="text-[9px] text-gray-400 uppercase tracking-widest w-full mb-1">{t.catDistribution || 'Category Distribution'} ({nd}{nodeId})</div>
-          <div className="w-24 h-24">
-            <DonutChart 
-              data={[
-                { label: 'МГТ', value: nodeAccumulated['МГТ'] || 0, color: CHART_COLORS[0] },
-                { label: 'КГТ+', value: nodeAccumulated['КГТ+'] || 0, color: CHART_COLORS[1] },
-                { label: 'СГТ', value: nodeAccumulated['СГТ'] || 0, color: CHART_COLORS[2] }
-              ]} 
-              title="Total"
-            />
-          </div>
-          <div className="w-full mt-2 flex flex-wrap justify-center gap-2 text-[8px]">
-            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full" style={{backgroundColor: CHART_COLORS[0]}}></span>МГТ: {nodeAccumulated['МГТ'] || 0}</span>
-            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full" style={{backgroundColor: CHART_COLORS[1]}}></span>КГТ+: {nodeAccumulated['КГТ+'] || 0}</span>
-            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full" style={{backgroundColor: CHART_COLORS[2]}}></span>СГТ: {nodeAccumulated['СГТ'] || 0}</span>
-          </div>
+          <DonutChart 
+            dataObj={{
+              'МГТ': nodeAccumulated['МГТ'] || 0,
+              'КГТ+': nodeAccumulated['КГТ+'] || 0,
+              'СГТ': nodeAccumulated['СГТ'] || 0
+            }} 
+            title={`${t.catDistribution || 'Category Distribution'} (${nd}${nodeId})`} 
+          />
         </div>
         
         {/* Zone donut */}
         <div className="glass-panel p-3 rounded-xl flex-1 flex flex-col items-center justify-center">
-          <div className="text-[9px] text-gray-400 uppercase tracking-widest w-full mb-1">{lang === 'ru' ? 'Распределение Зон' : 'Zone Distribution'} ({nd}{nodeId})</div>
-          <div className="w-24 h-24">
-            <DonutChart 
-              data={nodeId === 1 ? [
-                { label: 'Zone C', value: nodeAccumulated['C'] || 0, color: '#fb923c' },
-                { label: 'Mixed', value: nodeAccumulated['Mix'] || 0, color: '#c084fc' }
-              ] : [
-                { label: 'Zone B', value: nodeAccumulated['B'] || 0, color: '#4ade80' },
-                { label: 'Zone D', value: nodeAccumulated['D'] || 0, color: '#60a5fa' }
-              ]} 
-              title="Total"
-            />
-          </div>
-          <div className="w-full mt-2 flex flex-wrap justify-center gap-2 text-[8px]">
-            {nodeId === 1 ? (
-              <>
-                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>C: {nodeAccumulated['C'] || 0}</span>
-                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>Mix: {nodeAccumulated['Mix'] || 0}</span>
-              </>
-            ) : (
-              <>
-                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>B: {nodeAccumulated['B'] || 0}</span>
-                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>D: {nodeAccumulated['D'] || 0}</span>
-              </>
-            )}
-          </div>
+          <DonutChart 
+            dataObj={nodeId === 1 ? {
+              'C': nodeAccumulated['C'] || 0,
+              'Mix': nodeAccumulated['Mix'] || 0
+            } : {
+              'B': nodeAccumulated['B'] || 0,
+              'D': nodeAccumulated['D'] || 0
+            }} 
+            title={`${lang === 'ru' ? 'Распределение Зон' : 'Zone Distribution'} (${nd}${nodeId})`} 
+          />
         </div>
 
         {/* Routing Rules */}

@@ -215,8 +215,8 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
           const p = parcelsRef.current[i];
           if (p.isJammed || p.progress >= 1) continue;
 
-          if (isGameMode && jamsInWindow.current < 2 && (now - lastJamTime.current > 30000)) {
-            if (Math.random() < 0.0001) {
+          if (isGameMode && jamsInWindow.current < 10 && (now - lastJamTime.current > 10000)) {
+            if (Math.random() < 0.0005) {
               p.isJammed = true;
               jamCounter.current += 1;
               jamsInWindow.current += 1;

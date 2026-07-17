@@ -8,22 +8,22 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
   // Node 2: fragment showing Mixed Zone arrival, Node 2, Zone B (left)
   const viewBox = nodeId === 1 ? "540 -20 280 360" : "-20 120 280 360";
   
-  const node1Paths = ['pathA', 'pathR1', 'pathD', 'pathZoneD'];
-  const node2Paths = ['pathMix', 'pathR2', 'pathB'];
+  const node1Paths = ['pathA', 'pathR1', 'pathD'];
+  const node2Paths = ['pathMix', 'pathR2', 'pathB', 'pathC'];
   const relevantPaths = nodeId === 1 ? node1Paths : node2Paths;
   const nodeParcels = parcels.filter(p => relevantPaths.includes(p.pathId));
   
   const nodeCatCounts = { 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0 };
-  const nodeZoneCounts = nodeId === 1 ? { 'C': 0, 'D': 0, 'Mix': 0 } : { 'B': 0 };
+  const nodeZoneCounts = nodeId === 1 ? { 'C': 0, 'Mix': 0 } : { 'B': 0, 'D': 0 };
   
   nodeParcels.forEach(p => {
     nodeCatCounts[p.category] = (nodeCatCounts[p.category] || 0) + 1;
     if (nodeId === 1) {
       if (p.pathId === 'pathD') nodeZoneCounts['C'] += 1;
-      else if (p.pathId === 'pathZoneD') nodeZoneCounts['D'] += 1;
       else nodeZoneCounts['Mix'] += 1;
     } else {
-      nodeZoneCounts['B'] += 1;
+      if (p.pathId === 'pathC') nodeZoneCounts['D'] += 1;
+      else nodeZoneCounts['B'] += 1;
     }
   });
 
@@ -82,8 +82,8 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
             <h2 className="text-base font-bold text-white">{nd} {nodeId}</h2>
             <p className="text-[10px] text-gray-400">
               {nodeId === 1 
-                ? `${zn} A → DWS → ${zn} C ↑ / ${zn} D → / ${lang === 'ru' ? 'Смеш.' : 'Mix'} ↓` 
-                : `${lang === 'ru' ? 'Смеш. зона' : 'Mixed'} → ${zn} B ←`}
+                ? `${zn} A → DWS → ${zn} C ↑ / ${lang === 'ru' ? 'Смеш.' : 'Mix'} ↓` 
+                : `${lang === 'ru' ? 'Смеш. зона' : 'Mixed'} ↑ → ${zn} B ← / ${zn} D →`}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -110,14 +110,10 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
         <div className="glass-panel p-3 rounded-xl">
           <div className="text-[9px] text-gray-400 uppercase tracking-widest mb-2">{t.throughput || 'Throughput'}</div>
           {nodeId === 1 ? (
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <div className="bg-black/30 p-2 rounded-lg border border-white/5 text-center">
                 <div className="text-[9px] text-orange-400 flex items-center justify-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>C</div>
                 <div className="text-lg font-bold text-white">{nodeData.throughputC}</div>
-              </div>
-              <div className="bg-black/30 p-2 rounded-lg border border-white/5 text-center">
-                <div className="text-[9px] text-blue-400 flex items-center justify-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>D</div>
-                <div className="text-lg font-bold text-white">{nodeData.throughputD}</div>
               </div>
               <div className="bg-black/30 p-2 rounded-lg border border-white/5 text-center">
                 <div className="text-[9px] text-purple-400">→Mix</div>
@@ -125,9 +121,15 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
               </div>
             </div>
           ) : (
-            <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-center">
-              <div className="text-[9px] text-green-400 flex items-center justify-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> {zn} B</div>
-              <div className="text-2xl font-bold text-white">{nodeData.throughputB}</div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-black/30 p-2 rounded-lg border border-white/5 text-center">
+                <div className="text-[9px] text-green-400 flex items-center justify-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> {zn} B</div>
+                <div className="text-lg font-bold text-white">{nodeData.throughputB}</div>
+              </div>
+              <div className="bg-black/30 p-2 rounded-lg border border-white/5 text-center">
+                <div className="text-[9px] text-blue-400 flex items-center justify-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span> {zn} D</div>
+                <div className="text-lg font-bold text-white">{nodeData.throughputD}</div>
+              </div>
             </div>
           )}
         </div>
@@ -145,11 +147,13 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
             {nodeId === 1 ? (
               <>
                 <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span> <b>C:</b> {lang === 'ru' ? 'Негабарит' : 'Oversized'}</div>
-                <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span> <b>D:</b> {lang === 'ru' ? 'Скругл. >0.7' : 'Rnd >0.7'}</div>
                 <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span> <b>Mix:</b> {lang === 'ru' ? 'Остальные → Узел 2' : 'Rest → Node 2'}</div>
               </>
             ) : (
-              <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> <b>B:</b> {lang === 'ru' ? 'Все стандартные МГТ' : 'All standard MGT'}</div>
+              <>
+                <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> <b>B:</b> {lang === 'ru' ? 'Все стандартные МГТ' : 'All standard MGT'}</div>
+                <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span> <b>D:</b> {lang === 'ru' ? 'Скругл. >0.7' : 'Rnd >0.7'}</div>
+              </>
             )}
           </div>
         </div>

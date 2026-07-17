@@ -12,57 +12,22 @@ const getPos = (pathId, progress, offset, routingZone) => {
     x = 640 - (progress * 40);
     y = 200 + offset;
     angle = 0;
-  } else if (pathId === 'pathD') {
-    x = 600 + offset;
-    y = 200 - (progress * 180);
-    angle = 90;
-  } else if (pathId === 'pathZoneD') {
-    // From DWS area (700) going down 60px then right 100px
-    const totalDist = 160;
-    const currDist = progress * totalDist;
-    if (currDist < 60) {
-      x = 700 + offset;
-      y = 240 + currDist;
-      angle = 90;
-    } else {
-      x = 700 + (currDist - 60);
-      y = 300 + offset;
-      angle = 0;
-    }
-  } else if (pathId === 'pathMix') {
-    const totalDist = 757;
-    const currDist = progress * totalDist;
-    if (currDist < 150) {
-      x = 600 - offset;
-      y = 200 + currDist;
-      angle = 90;
-    } else if (currDist < 228.5) {
-      const p = (currDist - 150) / 78.5;
-      x = 550 + Math.cos(p * Math.PI/2) * 50 - offset * Math.sin(p * Math.PI/2);
-      y = 350 + Math.sin(p * Math.PI/2) * 50 - offset * Math.cos(p * Math.PI/2);
-      angle = 90 - p*90;
-    } else if (currDist < 528.5) {
-      x = 550 - (currDist - 228.5);
-      y = 400 + offset;
-      angle = 0;
-    } else if (currDist < 607) {
-      const p = (currDist - 528.5) / 78.5;
-      x = 250 - Math.cos(p * Math.PI/2) * 50 + offset * Math.sin(p * Math.PI/2);
-      y = 350 + Math.sin((1-p) * Math.PI/2) * 50 + offset * Math.cos(p * Math.PI/2);
-      angle = -p*90;
-    } else {
-      x = 200 + offset;
-      y = 350 - (currDist - 607);
-      angle = -90;
-    }
   } else if (pathId === 'pathR2') {
-    // All go left to Zone B
-    x = 200 - (progress * 80);
-    y = 200 + offset;
+    if (routingZone === 'D') {
+      x = 200 + (progress * 80);
+      y = 200 - offset;
+    } else {
+      x = 200 - (progress * 80);
+      y = 200 + offset;
+    }
     angle = 0;
   } else if (pathId === 'pathB') {
     x = 120 - (progress * 120);
     y = 200 + offset;
+    angle = 0;
+  } else if (pathId === 'pathC') {
+    x = 280 + (progress * 120);
+    y = 200 - offset;
     angle = 0;
   }
 
@@ -94,11 +59,11 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
             <path d="M 800,200 L 640,200" />
             <path d="M 640,200 L 600,200" />
             <path d="M 600,160 L 600,20" />
-            <path d="M 700,240 L 700,300" />
-            <path d="M 700,300 L 800,300" />
             <path d="M 600,240 L 600,350 Q 600,400 550,400 L 250,400 Q 200,400 200,350 L 200,240" />
             <path d="M 200,200 L 120,200" />
             <path d="M 120,200 L 0,200" />
+            <path d="M 200,200 L 280,200" />
+            <path d="M 280,200 L 400,200" />
           </g>
 
           {/* Layer 2: Dark Belt Background */}
@@ -106,11 +71,11 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
             <path d="M 800,200 L 640,200" />
             <path d="M 640,200 L 600,200" />
             <path d="M 600,160 L 600,20" />
-            <path d="M 700,240 L 700,300" />
-            <path d="M 700,300 L 800,300" />
             <path d="M 600,240 L 600,350 Q 600,400 550,400 L 250,400 Q 200,400 200,350 L 200,240" />
             <path d="M 200,200 L 120,200" />
             <path d="M 120,200 L 0,200" />
+            <path d="M 200,200 L 280,200" />
+            <path d="M 280,200 L 400,200" />
           </g>
           
           {/* Layer 3: Animated Stripes */}
@@ -120,13 +85,13 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
               <path d="M 600,240 L 600,350 Q 600,400 550,400 L 250,400 Q 200,400 200,350 L 200,240" />
               <path d="M 600,160 L 600,20" />
               <path d="M 120,200 L 0,200" />
-              <path d="M 700,240 L 700,300" />
-              <path d="M 700,300 L 800,300" />
+              <path d="M 280,200 L 400,200" />
             </g>
             <g className={fastStripeClass}>
               <path d="M 620,240 L 620,160" strokeWidth="40" />
               <path d="M 640,200 L 600,200" />
               <path d="M 200,200 L 120,200" />
+              <path d="M 200,200 L 280,200" />
             </g>
           </g>
         </g>
@@ -158,9 +123,9 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
           <circle cx="8" cy="176" r="5" fill="#4ade80" />
           <text x="18" y="180" fill="#4ade80">{lang==='ru'?'Зона':'Zone'} B</text>
           
-          {/* Zone D (blue) — RIGHT from DWS (new path) */}
-          <circle cx="748" cy="336" r="5" fill="#60a5fa" />
-          <text x="758" y="340" fill="#60a5fa">{lang==='ru'?'Зона':'Zone'} D</text>
+          {/* Zone D (blue) — RIGHT from Node 2 */}
+          <circle cx="368" cy="176" r="5" fill="#60a5fa" />
+          <text x="378" y="180" fill="#60a5fa">{lang==='ru'?'Зона':'Zone'} D</text>
           
           <text x="560" y="215" fill="#00E5FF" fontSize="12">{lang==='ru'?'Узел':'Node'} 1</text>
           <text x="200" y="150" textAnchor="middle" fill="#536DFE" fontSize="12">{lang==='ru'?'Узел':'Node'} 2</text>
@@ -172,8 +137,6 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
           <path d="M 780,170 L 740,170 L 748,166 M 740,170 L 748,174" />
           {/* pathD (Zone C): up */}
           <path d="M 570,120 L 570,60 L 566,68 M 570,60 L 574,68" />
-          {/* pathZoneD: down then right */}
-          <path d="M 720,270 L 720,290 M 740,330 L 780,330 L 774,326 M 780,330 L 774,334" />
           {/* pathMix: down */}
           <path d="M 630,300 L 630,340 L 626,332 M 630,340 L 634,332" />
           {/* pathMix: left */}
@@ -182,6 +145,8 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
           <path d="M 170,300 L 170,260 L 166,268 M 170,260 L 174,268" />
           {/* pathB: left */}
           <path d="M 100,170 L 50,170 L 58,166 M 50,170 L 58,174" />
+          {/* pathC: right */}
+          <path d="M 300,170 L 350,170 L 342,166 M 350,170 L 342,174" />
         </g>
 
         {/* Parcels */}

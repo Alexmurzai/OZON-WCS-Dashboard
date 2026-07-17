@@ -5,10 +5,10 @@ const PATH_LENGTHS = {
   pathA: 160,
   pathR1: 40,
   pathD: 180,
-  pathZoneD: 160, // 60 vertical connector + 100 horizontal
   pathMix: 757,
   pathR2: 80,
-  pathB: 120
+  pathB: 120,
+  pathC: 120
 };
 
 export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
@@ -117,8 +117,8 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
         const oee = (availability * performance * quality) / 10000;
         
         const all = parcelsRef.current;
-        const n1Active = all.filter(p => ['pathA','pathR1','pathD','pathZoneD'].includes(p.pathId)).length;
-        const n2Active = all.filter(p => ['pathMix','pathR2','pathB'].includes(p.pathId)).length;
+        const n1Active = all.filter(p => ['pathA','pathR1','pathD'].includes(p.pathId)).length;
+        const n2Active = all.filter(p => ['pathMix','pathR2','pathB','pathC'].includes(p.pathId)).length;
         
         return {
           ...prev, throughput, historyData: newHistory,
@@ -127,8 +127,8 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
           performance: performance.toFixed(1),
           quality: quality.toFixed(1),
           oee: oee.toFixed(1),
-          node1: { active: n1Active, throughputC: exitCountC.current, throughputD: exitCountD.current, throughputMix: exitCountMix.current },
-          node2: { active: n2Active, throughputB: exitCountB.current }
+          node1: { active: n1Active, throughputC: exitCountC.current, throughputMix: exitCountMix.current },
+          node2: { active: n2Active, throughputB: exitCountB.current, throughputD: exitCountD.current }
         };
       });
     }, 1000);
@@ -240,26 +240,30 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
           if (prog >= 1) {
             if (pid === 'pathA') { pid = 'pathR1'; prog = 0; }
             else if (pid === 'pathR1') {
-              // Node 1: Zone C up, Zone D right, else down to mixed
+              // Node 1: Zone C up, else down to mixed
               if (p.routingZone === 'C') pid = 'pathD';
-              else if (p.routingZone === 'D') pid = 'pathZoneD';
               else pid = 'pathMix';
               prog = 0;
             }
             else if (pid === 'pathMix') { pid = 'pathR2'; prog = 0; exitCountMix.current += 1; }
-            else if (pid === 'pathR2') { pid = 'pathB'; prog = 0; }
+            else if (pid === 'pathR2') {
+              // Node 2: Zone D right (pathC), else Zone B left (pathB)
+              if (p.routingZone === 'D') pid = 'pathC';
+              else pid = 'pathB';
+              prog = 0;
+            }
           }
           return { ...p, progress: prog, pathId: pid };
         });
 
         // Filter finished
         parcelsRef.current = parcelsRef.current.filter(p => {
-          if (p.progress >= 1 && ['pathD', 'pathB', 'pathZoneD'].includes(p.pathId)) {
+          if (p.progress >= 1 && ['pathD', 'pathB', 'pathC'].includes(p.pathId)) {
             completedThisTick.current += 1;
             totalCompletedAllTime.current += 1;
             if (p.pathId === 'pathD') exitCountC.current += 1;
             if (p.pathId === 'pathB') exitCountB.current += 1;
-            if (p.pathId === 'pathZoneD') exitCountD.current += 1;
+            if (p.pathId === 'pathC') exitCountD.current += 1;
             return false;
           }
           return true;

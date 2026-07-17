@@ -142,24 +142,24 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
 
         {/* Zone & Node Labels */}
         <g fontSize="14" fontWeight="bold" fontFamily="monospace">
-          <text x="730" y="175" fill="rgba(255,255,255,0.6)">{lang==='ru'?'Зона':'Zone'} A</text>
+          <text x="730" y="165" fill="rgba(255,255,255,0.6)">Zona A</text>
           
           {/* Zone C (orange) — UP from Node 1 */}
-          <circle cx="568" cy="6" r="5" fill="#fb923c" />
-          <text x="580" y="10" fill="#fb923c">{lang==='ru'?'Зона':'Zone'} C</text>
+          <circle cx="568" cy="4" r="5" fill="#fb923c" />
+          <text x="580" y="8" fill="#fb923c">Zona C</text>
           
-          <text x="350" y="450" fill="rgba(255,255,255,0.6)">{lang==='ru'?'Смешанная зона':'Mixed Zone'}</text>
+          <text x="350" y="470" fill="rgba(255,255,255,0.6)">{lang==='ru'?'Смешанная зона':'Mixed Zone'}</text>
           
           {/* Zone B (green) — LEFT from Node 2 */}
-          <circle cx="8" cy="176" r="5" fill="#4ade80" />
-          <text x="18" y="180" fill="#4ade80">{lang==='ru'?'Зона':'Zone'} B</text>
+          <circle cx="8" cy="161" r="5" fill="#4ade80" />
+          <text x="18" y="165" fill="#4ade80">Zona B</text>
           
           {/* Zone D (blue) — RIGHT from Node 2 */}
-          <circle cx="368" cy="176" r="5" fill="#60a5fa" />
-          <text x="378" y="180" fill="#60a5fa">{lang==='ru'?'Зона':'Zone'} D</text>
+          <circle cx="368" cy="161" r="5" fill="#60a5fa" />
+          <text x="378" y="165" fill="#60a5fa">Zona D</text>
           
-          <text x="545" y="205" textAnchor="end" fill="#00E5FF" fontSize="12">{lang==='ru'?'Узел':'Node'} 1</text>
-          <text x="200" y="145" textAnchor="middle" fill="#536DFE" fontSize="12">{lang==='ru'?'Узел':'Node'} 2</text>
+          <text x="545" y="225" textAnchor="end" fill="#00E5FF" fontSize="12">Node 1</text>
+          <text x="200" y="165" textAnchor="middle" fill="#536DFE" fontSize="12">Node 2</text>
         </g>
 
         {/* Direction arrows */}

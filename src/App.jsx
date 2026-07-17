@@ -19,7 +19,7 @@ export default function App() {
   const [isGameMode, setIsGameMode] = useState(false);
   const [isStarted, setIsStarted] = useState(false);
 
-  const { parcels, historyParcels, metrics, clearJam, calibrate } = useConveyorSimulation(speed, isStarted, isEStop, isGameMode);
+  const { parcels, historyParcels, node1History, node2History, metrics, clearJam, calibrate } = useConveyorSimulation(speed, isStarted, isEStop, isGameMode);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
@@ -192,10 +192,10 @@ export default function App() {
       {(activeTab === 'node1' || activeTab === 'node2') && (
         <main className="flex-1 p-3 min-h-0 overflow-hidden">
           {/* Node 1 Detail */}
-          {activeTab === 'node1' && <NodeDetailView nodeId={1} parcels={parcels} historyParcels={historyParcels} metrics={metrics} t={t} isEStop={isEStop} lang={lang} />}
+          {activeTab === 'node1' && <NodeDetailView nodeId={1} parcels={parcels} historyParcels={node1History} metrics={metrics} t={t} isEStop={isEStop} lang={lang} />}
           
           {/* Node 2 Detail */}
-          {activeTab === 'node2' && <NodeDetailView nodeId={2} parcels={parcels} historyParcels={historyParcels} metrics={metrics} t={t} isEStop={isEStop} lang={lang} />}
+          {activeTab === 'node2' && <NodeDetailView nodeId={2} parcels={parcels} historyParcels={node2History} metrics={metrics} t={t} isEStop={isEStop} lang={lang} />}
         </main>
       )}
     </div>

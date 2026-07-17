@@ -33,6 +33,10 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
 
   const parcelsRef = useRef([]);
   const historyParcelsRef = useRef([]);
+  const node1HistoryRef = useRef([]);
+  const node2HistoryRef = useRef([]);
+  const node1AccRef = useRef({ 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0, 'C': 0, 'Mix': 0 });
+  const node2AccRef = useRef({ 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0, 'B': 0, 'D': 0 });
   const lastTimeRef = useRef(null);
   const animRef = useRef(null);
   
@@ -60,6 +64,10 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
     if (isStarted) {
       parcelsRef.current = [];
       historyParcelsRef.current = [];
+      node1HistoryRef.current = [];
+      node2HistoryRef.current = [];
+      node1AccRef.current = { 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0, 'C': 0, 'Mix': 0 };
+      node2AccRef.current = { 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0, 'B': 0, 'D': 0 };
       completionWindow.current = Array(60).fill(0);
       completedThisTick.current = 0;
       totalCompletedAllTime.current = 0;
@@ -134,7 +142,9 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
           quality: quality.toFixed(1),
           oee: oee.toFixed(1),
           node1: { active: n1Active, throughputC: exitCountC.current, throughputMix: exitCountMix.current },
-          node2: { active: n2Active, throughputB: exitCountB.current, throughputD: exitCountD.current }
+          node2: { active: n2Active, throughputB: exitCountB.current, throughputD: exitCountD.current },
+          node1Accumulated: { ...node1AccRef.current },
+          node2Accumulated: { ...node2AccRef.current }
         };
       });
     }, 1000);
@@ -173,24 +183,10 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
       if (isNoRead) noReadCounter.current += 1;
       
       setMetrics(m => {
-        const n1Acc = { ...m.node1Accumulated };
-        n1Acc[category] = (n1Acc[category] || 0) + 1;
-        if (routingZone === 'C') n1Acc['C'] = (n1Acc['C'] || 0) + 1;
-        else n1Acc['Mix'] = (n1Acc['Mix'] || 0) + 1;
-        
-        const n2Acc = { ...m.node2Accumulated };
-        if (routingZone !== 'C') {
-          n2Acc[category] = (n2Acc[category] || 0) + 1;
-          if (routingZone === 'D') n2Acc['D'] = (n2Acc['D'] || 0) + 1;
-          else n2Acc['B'] = (n2Acc['B'] || 0) + 1;
-        }
-
         return {
           ...m, totalProcessed: m.totalProcessed + 1,
           catCounts: { ...m.catCounts, [category]: m.catCounts[category] + 1 },
-          zoneCounts: { ...m.zoneCounts, [routingZone]: m.zoneCounts[routingZone] + 1 },
-          node1Accumulated: n1Acc,
-          node2Accumulated: n2Acc
+          zoneCounts: { ...m.zoneCounts, [routingZone]: m.zoneCounts[routingZone] + 1 }
         };
       });
       parcelsRef.current = [...parcelsRef.current, newParcel];
@@ -261,14 +257,28 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
           let pid = p.pathId;
 
           if (prog >= 1) {
-            if (pid === 'pathA') { pid = 'pathR1'; prog = 0; }
+            if (pid === 'pathA') { 
+              pid = 'pathR1'; prog = 0; 
+              // Parcel arrived at Node 1
+              node1HistoryRef.current = [...node1HistoryRef.current, { ...p, timestamp: new Date().toISOString() }];
+              node1AccRef.current[p.category] += 1;
+              if (p.routingZone === 'C') node1AccRef.current['C'] += 1;
+              else node1AccRef.current['Mix'] += 1;
+            }
             else if (pid === 'pathR1') {
               // Node 1: Zone C up, else down to mixed
               if (p.routingZone === 'C') pid = 'pathD';
               else pid = 'pathMix';
               prog = 0;
             }
-            else if (pid === 'pathMix') { pid = 'pathR2'; prog = 0; exitCountMix.current += 1; }
+            else if (pid === 'pathMix') { 
+              pid = 'pathR2'; prog = 0; exitCountMix.current += 1; 
+              // Parcel arrived at Node 2
+              node2HistoryRef.current = [...node2HistoryRef.current, { ...p, timestamp: new Date().toISOString() }];
+              node2AccRef.current[p.category] += 1;
+              if (p.routingZone === 'D') node2AccRef.current['D'] += 1;
+              else node2AccRef.current['B'] += 1;
+            }
             else if (pid === 'pathR2') {
               // Node 2: Zone D right (pathC), else Zone B left (pathB)
               if (p.routingZone === 'D') pid = 'pathC';
@@ -312,6 +322,8 @@ export function useConveyorSimulation(speed, isStarted, isEStop, isGameMode) {
   return { 
     parcels, 
     historyParcels: historyParcelsRef.current,
+    node1History: node1HistoryRef.current,
+    node2History: node2HistoryRef.current,
     metrics, 
     clearJam, 
     calibrate 

@@ -18,11 +18,8 @@ export default function NodeDetailView({ nodeId, parcels, historyParcels = [], m
   const nodeAccumulated = nodeId === 1 ? metrics.node1Accumulated : metrics.node2Accumulated;
   const hasJam = nodeParcels.some(p => p.isJammed);
   
-  // Historical parcels for this node
-  const nodeHistory = historyParcels.filter(p => {
-    if (nodeId === 1) return true; // Node 1 sees everything
-    return p.routingZone !== 'C'; // Node 2 sees everything except Zone C
-  });
+  // Historical parcels for this node (already filtered by App)
+  const nodeHistory = historyParcels;
   
   const zn = lang === 'ru' ? 'Зона' : 'Zone';
   const nd = lang === 'ru' ? 'Узел' : 'Node';

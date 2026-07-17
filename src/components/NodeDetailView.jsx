@@ -4,30 +4,26 @@ import { DonutChart, ProgressRing } from './StatsPanel';
 import { CHART_COLORS } from '../constants';
 
 export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, lang = 'en' }) {
-  // Node 1: Zone A (right), Node 1, Zone C (up) — crop left side
-  // Node 2: Zone B (left), Node 2 horizontal, Zone D (right) — crop top
-  const viewBox = nodeId === 1 ? "500 -10 320 490" : "-10 100 430 380";
+  // Node 1: fragment showing Zone A, DWS, Node 1, Zone C (up), Zone D (right-down) 
+  // Node 2: fragment showing Mixed Zone arrival, Node 2, Zone B (left)
+  const viewBox = nodeId === 1 ? "540 -20 280 360" : "-20 120 280 360";
   
-  // Filter parcels relevant to this node
-  const node1Paths = ['pathA', 'pathR1', 'pathD'];
-  const node2Paths = ['pathMix', 'pathR2', 'pathB', 'pathC'];
+  const node1Paths = ['pathA', 'pathR1', 'pathD', 'pathZoneD'];
+  const node2Paths = ['pathMix', 'pathR2', 'pathB'];
   const relevantPaths = nodeId === 1 ? node1Paths : node2Paths;
   const nodeParcels = parcels.filter(p => relevantPaths.includes(p.pathId));
   
-  // Node-specific category and zone distribution
   const nodeCatCounts = { 'МГТ': 0, 'КГТ+': 0, 'СГТ': 0 };
-  // Node 1: routes to Zone C (up) or Mixed (down to Node 2)
-  // Node 2: routes to Zone B (left) or Zone D (right)
-  const nodeZoneCounts = nodeId === 1 ? { 'C': 0, 'Mix': 0 } : { 'B': 0, 'D': 0 };
+  const nodeZoneCounts = nodeId === 1 ? { 'C': 0, 'D': 0, 'Mix': 0 } : { 'B': 0 };
   
   nodeParcels.forEach(p => {
     nodeCatCounts[p.category] = (nodeCatCounts[p.category] || 0) + 1;
     if (nodeId === 1) {
       if (p.pathId === 'pathD') nodeZoneCounts['C'] += 1;
+      else if (p.pathId === 'pathZoneD') nodeZoneCounts['D'] += 1;
       else nodeZoneCounts['Mix'] += 1;
     } else {
-      if (p.pathId === 'pathC') nodeZoneCounts['D'] += 1;
-      else nodeZoneCounts['B'] += 1;
+      nodeZoneCounts['B'] += 1;
     }
   });
 
@@ -37,28 +33,67 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
   const zn = lang === 'ru' ? 'Зона' : 'Zone';
   const nd = lang === 'ru' ? 'Узел' : 'Node';
   
+  const catColor = (cat) => {
+    if (cat === 'МГТ') return '#22d3ee';
+    if (cat === 'КГТ+') return '#6366f1';
+    if (cat === 'СГТ') return '#d946ef';
+    return '#888';
+  };
+  
   return (
     <div className="flex gap-3 h-full animate-in fade-in duration-500">
       
-      {/* LEFT: Zoomed ConveyorLayout */}
+      {/* LEFT: Parcel Table */}
+      <div className="w-[240px] shrink-0 glass-panel p-3 rounded-xl flex flex-col min-h-0 overflow-hidden">
+        <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-2">{t.passingParcels || 'Passing Parcels'}</div>
+        <div className="flex-1 overflow-y-auto scrollbar-hide text-[10px]">
+          <table className="w-full">
+            <thead className="sticky top-0 bg-[#12121a]">
+              <tr className="text-gray-500">
+                <th className="text-left py-1 px-1">ID</th>
+                <th className="text-left py-1 px-1">{lang === 'ru' ? 'Кат.' : 'Cat.'}</th>
+                <th className="text-right py-1 px-1">{lang === 'ru' ? 'Вес' : 'Wt'}</th>
+                <th className="text-right py-1 px-1">{lang === 'ru' ? 'Габ.' : 'Dim'}</th>
+                <th className="text-right py-1 px-1">{lang === 'ru' ? 'Скр.' : 'Rnd'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {nodeParcels.slice(0, 30).map(p => (
+                <tr key={p.id} className="border-t border-white/5 text-gray-300 hover:bg-white/5">
+                  <td className="py-0.5 px-1 font-mono text-[9px]">{p.id.split('-')[1]}</td>
+                  <td className="py-0.5 px-1 font-bold" style={{color: catColor(p.category)}}>{p.category}</td>
+                  <td className="py-0.5 px-1 text-right">{p.weight}</td>
+                  <td className="py-0.5 px-1 text-right text-[9px]">{p.dimensions.x}×{p.dimensions.y}</td>
+                  <td className="py-0.5 px-1 text-right">{p.rounding_factor}</td>
+                </tr>
+              ))}
+              {nodeParcels.length === 0 && (
+                <tr><td colSpan="5" className="py-4 text-center text-gray-600 text-xs">{lang === 'ru' ? 'Нет грузов' : 'No parcels'}</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* CENTER: Zoomed ConveyorLayout (fragment) */}
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="glass-panel p-3 rounded-xl flex justify-between items-center mb-3 shrink-0">
+        <div className="glass-panel p-2 rounded-xl flex justify-between items-center mb-2 shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-white">{nd} {nodeId}</h2>
+            <h2 className="text-base font-bold text-white">{nd} {nodeId}</h2>
             <p className="text-[10px] text-gray-400">
               {nodeId === 1 
-                ? `${zn} A → DWS → ${zn} C / ${lang === 'ru' ? 'Смешанная зона' : 'Mixed Zone'}` 
-                : `${lang === 'ru' ? 'Смешанная зона' : 'Mixed Zone'} → ${zn} B / ${zn} D`}
+                ? `${zn} A → DWS → ${zn} C ↑ / ${zn} D → / ${lang === 'ru' ? 'Смеш.' : 'Mix'} ↓` 
+                : `${lang === 'ru' ? 'Смеш. зона' : 'Mixed'} → ${zn} B ←`}
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${hasJam ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/10 text-green-400 border border-green-500/20'}`}>
-              <div className={`w-2 h-2 rounded-full ${hasJam ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></div>
+            <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold ${hasJam ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/10 text-green-400 border border-green-500/20'}`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${hasJam ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></div>
               {hasJam ? 'JAM' : 'OK'}
             </div>
             <div className="text-right">
-              <div className="text-[10px] text-gray-400">Active</div>
-              <div className="text-lg font-bold text-cyan-400">{nodeData.active}</div>
+              <div className="text-[9px] text-gray-400">Active</div>
+              <div className="text-sm font-bold text-cyan-400">{nodeData.active}</div>
             </div>
           </div>
         </div>
@@ -69,56 +104,52 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
       </div>
 
       {/* RIGHT: Node Stats */}
-      <div className="w-[280px] shrink-0 flex flex-col gap-3 overflow-y-auto scrollbar-hide">
+      <div className="w-[220px] shrink-0 flex flex-col gap-2 overflow-y-auto scrollbar-hide">
         
-        {/* Throughput per zone */}
-        <div className="glass-panel p-4 rounded-xl">
-          <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-3">{lang === 'ru' ? 'Пропускная способность' : 'Throughput'}</div>
+        {/* Throughput */}
+        <div className="glass-panel p-3 rounded-xl">
+          <div className="text-[9px] text-gray-400 uppercase tracking-widest mb-2">{t.throughput || 'Throughput'}</div>
           {nodeId === 1 ? (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-center">
-                <div className="text-[10px] text-orange-400 flex items-center justify-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span> {zn} C</div>
-                <div className="text-xl font-bold text-white">{nodeData.throughputD}</div>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-black/30 p-2 rounded-lg border border-white/5 text-center">
+                <div className="text-[9px] text-orange-400 flex items-center justify-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>C</div>
+                <div className="text-lg font-bold text-white">{nodeData.throughputC}</div>
               </div>
-              <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-center">
-                <div className="text-[10px] text-gray-400">→ {lang === 'ru' ? 'Смеш.' : 'Mixed'}</div>
-                <div className="text-xl font-bold text-white">{nodeData.throughputMix || '—'}</div>
+              <div className="bg-black/30 p-2 rounded-lg border border-white/5 text-center">
+                <div className="text-[9px] text-blue-400 flex items-center justify-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>D</div>
+                <div className="text-lg font-bold text-white">{nodeData.throughputD}</div>
+              </div>
+              <div className="bg-black/30 p-2 rounded-lg border border-white/5 text-center">
+                <div className="text-[9px] text-purple-400">→Mix</div>
+                <div className="text-lg font-bold text-white">{nodeData.throughputMix}</div>
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-center">
-                <div className="text-[10px] text-green-400 flex items-center justify-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> {zn} B</div>
-                <div className="text-xl font-bold text-white">{nodeData.throughputB}</div>
-              </div>
-              <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-center">
-                <div className="text-[10px] text-blue-400 flex items-center justify-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span> {zn} D</div>
-                <div className="text-xl font-bold text-white">{nodeData.throughputC}</div>
-              </div>
+            <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-center">
+              <div className="text-[9px] text-green-400 flex items-center justify-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> {zn} B</div>
+              <div className="text-2xl font-bold text-white">{nodeData.throughputB}</div>
             </div>
           )}
         </div>
         
-        {/* Category distribution for this node */}
-        <DonutChart dataObj={nodeCatCounts} title={`${t.catDistribution} (${nd} ${nodeId})`} />
+        {/* Category donut */}
+        <DonutChart dataObj={nodeCatCounts} title={`${t.catDistribution} (${nd}${nodeId})`} />
         
-        {/* Zone distribution for this node */}
-        <DonutChart dataObj={nodeZoneCounts} title={`${t.zoneDistribution} (${nd} ${nodeId})`} />
+        {/* Zone donut */}
+        <DonutChart dataObj={nodeZoneCounts} title={`${t.zoneDistribution} (${nd}${nodeId})`} />
 
-        {/* Routing zones explanation */}
+        {/* Routing Rules */}
         <div className="glass-panel p-3 rounded-xl">
-          <div className="text-[10px] text-gray-400 uppercase tracking-widest mb-2">{lang === 'ru' ? 'Правила маршрутизации' : 'Routing Rules'}</div>
-          <div className="text-[11px] text-gray-300 flex flex-col gap-1.5">
+          <div className="text-[9px] text-gray-400 uppercase tracking-widest mb-1">{t.routingRules || 'Routing Rules'}</div>
+          <div className="text-[10px] text-gray-300 flex flex-col gap-1">
             {nodeId === 1 ? (
               <>
-                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-400"></span> <b>{zn} C:</b> {lang === 'ru' ? 'Негабарит (СГТ, КГТ+)' : 'Oversized (SGT, KGT+)'}</div>
-                <div>⬇️ <b>{lang === 'ru' ? 'Смеш.' : 'Mixed'}:</b> {lang === 'ru' ? 'Все остальные → Узел 2' : 'All other → Node 2'}</div>
+                <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span> <b>C:</b> {lang === 'ru' ? 'Негабарит' : 'Oversized'}</div>
+                <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span> <b>D:</b> {lang === 'ru' ? 'Скругл. >0.7' : 'Rnd >0.7'}</div>
+                <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span> <b>Mix:</b> {lang === 'ru' ? 'Остальные → Узел 2' : 'Rest → Node 2'}</div>
               </>
             ) : (
-              <>
-                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400"></span> <b>{zn} B:</b> {lang === 'ru' ? 'Стандартные (МГТ)' : 'Standard (MGT)'}</div>
-                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-400"></span> <b>{zn} D:</b> {lang === 'ru' ? 'Скругление > 0.7' : 'Rounding > 0.7'}</div>
-              </>
+              <div className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> <b>B:</b> {lang === 'ru' ? 'Все стандартные МГТ' : 'All standard MGT'}</div>
             )}
           </div>
         </div>

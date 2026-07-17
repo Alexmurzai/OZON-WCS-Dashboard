@@ -49,6 +49,7 @@ export const translations = {
     zoneD: 'D (Repackaging)',
     mixedZone: 'Mixed Zone',
     oee: 'OEE',
+    oeeDesc: 'Overall Equipment Effectiveness',
     availability: 'Availability',
     performance: 'Performance',
     quality: 'Quality',
@@ -72,7 +73,10 @@ export const translations = {
     legendTitle: 'Legend & Abbreviations',
     gameMode: 'Game Mode',
     idealMode: 'Ideal Mode',
-    modeSelector: 'Operation Mode'
+    modeSelector: 'Operation Mode',
+    startConveyor: 'START',
+    passingParcels: 'Passing Parcels',
+    routingRules: 'Routing Rules'
   },
   ru: {
     systemOp: 'Система работает',
@@ -124,6 +128,7 @@ export const translations = {
     zoneD: 'D (Доупаковка)',
     mixedZone: 'Смешанная зона',
     oee: 'OEE',
+    oeeDesc: 'Общая Эффективность Оборудования',
     availability: 'Доступность',
     performance: 'Эффективность',
     quality: 'Качество',
@@ -147,7 +152,10 @@ export const translations = {
     legendTitle: 'Легенда и Расшифровка',
     gameMode: 'Игровой Режим',
     idealMode: 'Идеальный Режим',
-    modeSelector: 'Режим Симуляции'
+    modeSelector: 'Режим Симуляции',
+    startConveyor: 'ЗАПУСК',
+    passingParcels: 'Проходящие грузы',
+    routingRules: 'Правила маршрутизации'
   }
 };
 
@@ -163,7 +171,8 @@ export const CHART_COLORS = {
   'СГТ': '#d946ef',
   'B': '#4ade80',
   'C': '#fb923c',
-  'D': '#60a5fa'
+  'D': '#60a5fa',
+  'Mix': '#a78bfa'
 };
 
 export const DIVERTER_TYPES = ['Comitas Multibelt', 'Sliding Shoe', 'Pop-up Wheel'];

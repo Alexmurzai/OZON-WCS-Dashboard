@@ -142,24 +142,24 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
 
         {/* Zone & Node Labels */}
         <g fontSize="14" fontWeight="bold" fontFamily="monospace">
-          <text x="740" y="145" fill="rgba(255,255,255,0.6)">Zona A</text>
+          <text x="740" y="145" fill="rgba(255,255,255,0.6)">{lang==='ru'?'Зона':'Zone'} A</text>
           
           {/* Zone C (orange) — UP from Node 1 */}
           <circle cx="590" cy="-10" r="5" fill="#fb923c" />
-          <text x="600" y="-5" fill="#fb923c">Zona C</text>
+          <text x="600" y="-5" fill="#fb923c">{lang==='ru'?'Зона':'Zone'} C</text>
           
           <text x="350" y="470" fill="rgba(255,255,255,0.6)">{lang==='ru'?'Смешанная зона':'Mixed Zone'}</text>
           
           {/* Zone B (green) — LEFT from Node 2 */}
           <circle cx="8" cy="141" r="5" fill="#4ade80" />
-          <text x="18" y="145" fill="#4ade80">Zona B</text>
+          <text x="18" y="145" fill="#4ade80">{lang==='ru'?'Зона':'Zone'} B</text>
           
           {/* Zone D (blue) — RIGHT from Node 2 */}
           <circle cx="368" cy="141" r="5" fill="#60a5fa" />
-          <text x="378" y="145" fill="#60a5fa">Zona D</text>
+          <text x="378" y="145" fill="#60a5fa">{lang==='ru'?'Зона':'Zone'} D</text>
           
-          <text x="545" y="225" textAnchor="end" fill="#00E5FF" fontSize="12">Node 1</text>
-          <text x="200" y="145" textAnchor="middle" fill="#536DFE" fontSize="12">Node 2</text>
+          <text x="545" y="225" textAnchor="end" fill="#00E5FF" fontSize="12">{lang==='ru'?'Узел':'Node'} 1</text>
+          <text x="200" y="145" textAnchor="middle" fill="#536DFE" fontSize="12">{lang==='ru'?'Узел':'Node'} 2</text>
         </g>
 
         {/* Direction arrows */}

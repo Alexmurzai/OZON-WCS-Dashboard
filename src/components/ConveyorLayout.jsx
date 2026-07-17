@@ -64,7 +64,7 @@ const getPos = (pathId, progress, offset, routingZone) => {
   return { x, y, angle };
 };
 
-export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRunning = true, lang = 'en' }) {
+export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRunning = true, lang = 'en', activeNode = null }) {
   const [hoveredParcel, setHoveredParcel] = useState(null);
   
   const stripeClass = isRunning ? "animate-stripes" : "";
@@ -81,9 +81,16 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
+          <clipPath id="clip-node1">
+            <rect x="450" y="-50" width="400" height="600" />
+          </clipPath>
+          <clipPath id="clip-node2">
+            <rect x="-50" y="-50" width="500" height="600" />
+          </clipPath>
         </defs>
 
-        <g strokeLinejoin="miter" strokeLinecap="butt">
+        <g clipPath={activeNode === 1 ? "url(#clip-node1)" : activeNode === 2 ? "url(#clip-node2)" : undefined}>
+          <g strokeLinejoin="miter" strokeLinecap="butt">
           {/* Layer 1: Red Outline */}
           <g stroke="#FF5252" strokeWidth="84" fill="none">
             <path d="M 800,200 L 600,200" />
@@ -203,6 +210,7 @@ export default function ConveyorLayout({ parcels, viewBox = "0 0 820 470", isRun
             </g>
           );
         })}
+        </g>
       </svg>
 
       {/* Parcel Tooltip */}

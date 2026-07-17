@@ -99,7 +99,7 @@ export default function NodeDetailView({ nodeId, parcels, metrics, t, isEStop, l
         </div>
         
         <div className="flex-1 min-h-0">
-          <ConveyorLayout parcels={parcels} viewBox={viewBox} isRunning={!isEStop} lang={lang} />
+          <ConveyorLayout parcels={parcels} viewBox={viewBox} isRunning={!isEStop} lang={lang} activeNode={nodeId} />
         </div>
       </div>
 

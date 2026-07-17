@@ -12,6 +12,36 @@ const getPos = (pathId, progress, offset, routingZone) => {
     x = 640 - (progress * 40);
     y = 200 + offset;
     angle = 0;
+  } else if (pathId === 'pathD') {
+    x = 600 + offset;
+    y = 200 - (progress * 180);
+    angle = 90;
+  } else if (pathId === 'pathMix') {
+    const totalDist = 757;
+    const currDist = progress * totalDist;
+    if (currDist < 150) {
+      x = 600 - offset;
+      y = 200 + currDist;
+      angle = 90;
+    } else if (currDist < 228.5) {
+      const p = (currDist - 150) / 78.5;
+      x = 550 + Math.cos(p * Math.PI/2) * 50 - offset * Math.sin(p * Math.PI/2);
+      y = 350 + Math.sin(p * Math.PI/2) * 50 - offset * Math.cos(p * Math.PI/2);
+      angle = 90 - p*90;
+    } else if (currDist < 528.5) {
+      x = 550 - (currDist - 228.5);
+      y = 400 + offset;
+      angle = 0;
+    } else if (currDist < 607) {
+      const p = (currDist - 528.5) / 78.5;
+      x = 250 - Math.cos(p * Math.PI/2) * 50 + offset * Math.sin(p * Math.PI/2);
+      y = 350 + Math.sin((1-p) * Math.PI/2) * 50 + offset * Math.cos(p * Math.PI/2);
+      angle = -p*90;
+    } else {
+      x = 200 + offset;
+      y = 350 - (currDist - 607);
+      angle = -90;
+    }
   } else if (pathId === 'pathR2') {
     if (routingZone === 'D') {
       x = 200 + (progress * 80);
